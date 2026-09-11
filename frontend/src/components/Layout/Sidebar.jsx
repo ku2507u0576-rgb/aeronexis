@@ -45,7 +45,7 @@ const Sidebar = () => {
     <Sider breakpoint="lg" collapsedWidth="0" theme="dark" width={220}>
       <div style={{ height: '3px', width: '100%', background: 'linear-gradient(90deg, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%, #138808 100%)' }} />
       <div style={{ padding: '16px', color: 'white', fontSize: '18px', fontWeight: 'bold', textAlign: 'center', letterSpacing: '1px' }}>
-        ✈️ Aeronexis
+        ✈️ Aero
       </div>
       <Menu
         theme="dark"

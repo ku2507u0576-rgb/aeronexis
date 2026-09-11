@@ -247,7 +247,7 @@ const Navbar = () => {
       {/* Left: Title */}
       <div style={{ paddingLeft: 24, display: 'flex', flexDirection: 'column', lineHeight: 1.3 }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: '#001529', letterSpacing: 0.5 }}>
-          ✈️ Aeronexis <span style={{ color: '#FF9933' }}>(Real-Time Airfare Price Index)</span>
+          ✈️ Aero <span style={{ color: '#FF9933' }}>(Real-Time Airfare Price Index)</span>
         </div>
         <div style={{ fontSize: 11, color: '#8c8c8c', letterSpacing: 0.5 }}>
           Ministry of Statistics &amp; Programme Implementation · India

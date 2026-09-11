@@ -93,7 +93,7 @@ const AirplaneIntro = ({ onComplete }) => {
           <span className="intro-plane-icon">✈</span>
         </div>
         <div className="intro-eyebrow">GOVERNMENT OF INDIA · MINISTRY OF CIVIL AVIATION</div>
-        <h1 className="intro-title">AIRFARE<br /><span className="intro-title-accent">INDIA</span></h1>
+        <h1 className="intro-title">AERO<br /><span className="intro-title-accent">INDIA</span></h1>
         <p className="intro-subtitle">Real-Time Airfare Price Index</p>
         <div className="intro-tagline">
           <span className="intro-dot saffron" />

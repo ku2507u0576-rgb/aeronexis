@@ -287,7 +287,7 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline, travelDate
         <div style={{ position: 'absolute', bottom: -30, left: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
 
         <div style={{ fontSize: 9, letterSpacing: 4, opacity: 0.6, marginBottom: 16 }}>
-          BOARDING PASS · AERONEXIS · {travelDate ? dayjs(travelDate).format('DD MMM YYYY').toUpperCase() : 'UPCOMING'} · {passengers} {passengers === 1 ? 'PASSENGER' : 'PASSENGERS'}
+          BOARDING PASS · AERO · {travelDate ? dayjs(travelDate).format('DD MMM YYYY').toUpperCase() : 'UPCOMING'} · {passengers} {passengers === 1 ? 'PASSENGER' : 'PASSENGERS'}
         </div>
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
@@ -354,7 +354,7 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline, travelDate
             ))}
           </div>
         </div>
-        <div style={{ textAlign: 'center', fontSize: 9, opacity: 0.5, marginTop: 4 }}>AERONEXIS-{booking?.pnr || 'XXXXXXXX'}</div>
+        <div style={{ textAlign: 'center', fontSize: 9, opacity: 0.5, marginTop: 4 }}>AERO-{booking?.pnr || 'XXXXXXXX'}</div>
       </div>
 
       <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center' }}>
