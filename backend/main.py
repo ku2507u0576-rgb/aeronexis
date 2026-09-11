@@ -1,18 +1,21 @@
 """
-Real-Time Airfare Price Index (APIx) — FastAPI Backend
-Government-grade airfare monitoring platform for India.
-Crash-resilient with global exception handling and health checks.
+Aero | Real-Time Airfare Price Index (APIx) — Unified Platform Server
+Merges Frontend Web App, REST API, API Documentation (Swagger/ReDoc), and Health Check under a single unified URL.
 """
 from __future__ import annotations
 
+import os
 import traceback
 from datetime import datetime
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from backend.api.routes import router
 from backend.database import engine, Base
+
+FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "build")
 
 
 def init_db():
@@ -21,7 +24,7 @@ def init_db():
 
 
 app = FastAPI(
-    title="Real-Time Airfare Price Index (APIx) API",
+    title="Aero | Real-Time Airfare Price Index (APIx) API",
     description="Government-grade airfare price monitoring platform for India. "
                 "Tracks fares from 5 airlines + 6 OTAs across 10 Tier-1 routes. "
                 "All values in ₹ (INR).",
@@ -30,7 +33,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS — allow frontend on any port
+# CORS — allow cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -61,30 +64,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.exception_handler(404)
-async def not_found_handler(request: Request, exc):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "status": "error",
-            "message": f"Endpoint '{request.url.path}' not found",
-            "docs": "/docs",
-        },
-    )
-
-
-@app.exception_handler(422)
-async def validation_error_handler(request: Request, exc):
-    return JSONResponse(
-        status_code=422,
-        content={
-            "status": "error",
-            "message": "Invalid request parameters",
-            "detail": str(exc),
-        },
-    )
-
-
 # ============ Startup ============
 
 @app.on_event("startup")
@@ -97,19 +76,7 @@ def on_startup():
         print(f"⚠️ Database init warning (may already exist): {e}")
 
 
-# ============ Root & Health Endpoints ============
-
-@app.get("/")
-def read_root():
-    return {
-        "message": "Welcome to the Real-Time Airfare Price Index (APIx) API",
-        "version": "1.0.0",
-        "currency": "INR (₹)",
-        "country": "India",
-        "docs": "/docs",
-        "redoc": "/redoc",
-    }
-
+# ============ Health Endpoints ============
 
 @app.get("/health")
 @app.get("/v1/health")
@@ -138,10 +105,12 @@ def health_check():
     return {
         "status": overall,
         "version": "1.0.0",
+        "service": "Aero Unified Platform",
         "timestamp": datetime.now().isoformat(),
         "components": {
             "database": {"status": db_status, "latency_ms": db_latency_ms},
             "api": {"status": "healthy"},
+            "frontend": {"status": "mounted" if os.path.exists(FRONTEND_BUILD_DIR) else "not_built"},
         },
         "cache": cache_stats,
         "circuit_breakers": circuit_stats,
@@ -150,7 +119,7 @@ def health_check():
 
 @app.post("/admin/cache/clear")
 def clear_cache():
-    """Clear all in-memory caches. Use when data changes are not reflecting."""
+    """Clear all in-memory caches."""
     from backend.api.auth import route_cache, index_cache, dashboard_cache
     route_cache.clear()
     index_cache.clear()
@@ -158,6 +127,51 @@ def clear_cache():
     return {"status": "success", "message": "All caches cleared", "timestamp": datetime.now().isoformat()}
 
 
-# ============ Include API Router ============
+# ============ Include API Router (/v1/...) ============
 
 app.include_router(router, prefix="/v1")
+
+
+# ============ Mount Frontend Static Files & SPA Routing ============
+
+if os.path.exists(FRONTEND_BUILD_DIR):
+    static_dir = os.path.join(FRONTEND_BUILD_DIR, "static")
+    if os.path.exists(static_dir):
+        app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    images_dir = os.path.join(FRONTEND_BUILD_DIR, "images")
+    if os.path.exists(images_dir):
+        app.mount("/images", StaticFiles(directory=images_dir), name="images")
+
+    videos_dir = os.path.join(FRONTEND_BUILD_DIR, "videos")
+    if os.path.exists(videos_dir):
+        app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
+
+
+@app.get("/{full_path:path}")
+async def serve_spa_or_file(full_path: str):
+    """Serve React frontend single-page application and static root files."""
+    # Never intercept backend routes or docs
+    if full_path.startswith("v1") or full_path in ("docs", "redoc", "openapi.json", "health", "v1/health"):
+        return JSONResponse(status_code=404, content={"status": "error", "message": f"Endpoint '{full_path}' not found"})
+
+    if os.path.exists(FRONTEND_BUILD_DIR):
+        # 1. Direct file match in build directory (e.g. favicon.ico, asset-manifest.json, 200.html)
+        if full_path:
+            specific_file = os.path.join(FRONTEND_BUILD_DIR, full_path)
+            if os.path.isfile(specific_file):
+                return FileResponse(specific_file)
+
+        # 2. SPA index.html fallback for all client-side routes (/route-search, /dashboard, etc.)
+        index_file = os.path.join(FRONTEND_BUILD_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+
+    return {
+        "message": "Welcome to Aero — Real-Time Airfare Price Index Platform",
+        "version": "1.0.0",
+        "api": "/v1",
+        "docs": "/docs",
+        "health": "/v1/health",
+    }
+

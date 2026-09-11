@@ -5,7 +5,10 @@ export const getBaseURL = () => {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:8000/v1';
     }
-    return 'https://aeronexis-api.onrender.com/v1';
+    if (window.location.hostname.includes('surge.sh') || window.location.hostname.includes('github.io')) {
+      return 'https://aeronexis.onrender.com/v1';
+    }
+    return '/v1';
   }
   return 'http://localhost:8000/v1';
 };
