@@ -6,6 +6,7 @@ import {
   LockOutlined, SafetyOutlined, IdcardOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -35,7 +36,7 @@ const PAYMENT_METHODS = [
 
 const fmt = (v) => `₹${Math.round(v).toLocaleString('en-IN')}`;
 
-const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
+const BookingModal = ({ visible, onClose, routeData, selectedAirline, travelDate, passengers = 1 }) => {
   const [step, setStep] = useState(0);
   const [form] = Form.useForm();
   const [selectedClass, setSelectedClass] = useState('Economy');
@@ -74,8 +75,8 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
         <div style={{ fontSize: 22, fontWeight: 800, color: '#1a1a2e' }}>
           {routeData.origin} → {routeData.destination}
         </div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>
-          {selectedAirline.airline_name} &nbsp;·&nbsp; Non-stop
+        <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+          {selectedAirline.airline_name} &nbsp;·&nbsp; {travelDate ? dayjs(travelDate).format('ddd, DD MMM YYYY') : 'Upcoming'} &nbsp;·&nbsp; {passengers} {passengers === 1 ? 'Passenger' : 'Passengers'}
         </div>
       </div>
 
@@ -101,8 +102,8 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#185FA5' : '#1a1a2e', marginBottom: 4 }}>{cls.label}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: isSelected ? '#185FA5' : '#1a1a2e' }}>{fmt(total)}</div>
-                <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>per adult, incl. taxes</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: isSelected ? '#185FA5' : '#1a1a2e' }}>{fmt(total * passengers)}</div>
+                <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{passengers > 1 ? `${fmt(total)} × ${passengers}` : 'incl. taxes'}</div>
                 {urgentSeats && <div style={{ fontSize: 10, color: '#e53e3e', marginTop: 4, fontWeight: 700 }}>🔥 Only {priceData?.seats_left} left!</div>}
               </div>
             );
@@ -114,9 +115,9 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
       <div style={{ background: '#f8fafc', borderRadius: 12, padding: 16, border: '1px solid #e2e8f0' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', letterSpacing: 2, marginBottom: 12 }}>FARE BREAKDOWN</div>
         {[
-          { label: 'Base Fare', val: classData.price },
-          { label: 'Taxes & Surcharges', val: classData.taxes },
-          { label: 'Convenience Fee', val: Math.round(classData.total * 0.02) },
+          { label: `Base Fare (${passengers} × ${fmt(classData.price)})`, val: classData.price * passengers },
+          { label: `Taxes & Surcharges (${passengers} × ${fmt(classData.taxes)})`, val: classData.taxes * passengers },
+          { label: 'Convenience Fee', val: Math.round(classData.total * 0.02 * passengers) },
         ].map(r => (
           <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
             <span style={{ color: '#64748b' }}>{r.label}</span>
@@ -125,8 +126,8 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
         ))}
         <Divider style={{ margin: '10px 0' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800 }}>
-          <span style={{ color: '#1a1a2e' }}>Total Payable</span>
-          <span style={{ color: '#185FA5' }}>{fmt(classData.total)}</span>
+          <span style={{ color: '#1a1a2e' }}>Total Payable ({passengers} {passengers === 1 ? 'Person' : 'Persons'})</span>
+          <span style={{ color: '#185FA5' }}>{fmt((classData.total + Math.round(classData.total * 0.02)) * passengers)}</span>
         </div>
       </div>
 
@@ -253,13 +254,15 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
         {/* Amount due */}
         <div style={{ background: 'linear-gradient(135deg, #185FA5, #1a73c8)', borderRadius: 14, padding: '16px 20px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 2 }}>AMOUNT DUE</div>
-            <div style={{ fontSize: 28, fontWeight: 900 }}>{fmt(classData.total)}</div>
+            <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 2 }}>
+              AMOUNT DUE ({passengers} {passengers === 1 ? 'PASSENGER' : 'PASSENGERS'})
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 900 }}>{fmt(classData.total * passengers)}</div>
           </div>
           <div style={{ textAlign: 'right', opacity: 0.8, fontSize: 12 }}>
             <div>{selectedAirline.airline_name}</div>
             <div>{routeData.origin} → {routeData.destination}</div>
-            <div>{selectedClass}</div>
+            <div>{travelDate ? dayjs(travelDate).format('DD MMM YYYY') : ''} · {selectedClass}</div>
           </div>
         </div>
       </div>
@@ -283,7 +286,9 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
         <div style={{ position: 'absolute', top: -20, right: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', bottom: -30, left: -10, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
 
-        <div style={{ fontSize: 9, letterSpacing: 4, opacity: 0.6, marginBottom: 16 }}>BOARDING PASS · APIX AIRWAYS</div>
+        <div style={{ fontSize: 9, letterSpacing: 4, opacity: 0.6, marginBottom: 16 }}>
+          BOARDING PASS · AERONEXIS · {travelDate ? dayjs(travelDate).format('DD MMM YYYY').toUpperCase() : 'UPCOMING'} · {passengers} {passengers === 1 ? 'PASSENGER' : 'PASSENGERS'}
+        </div>
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
             <div style={{ fontSize: 9, opacity: 0.6, marginBottom: 2 }}>FROM</div>
@@ -309,6 +314,7 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
             <div style={{ fontSize: 9, opacity: 0.6 }}>PASSENGER</div>
             <div style={{ fontWeight: 700, fontSize: 14 }}>
               {form.getFieldValue('firstName')} {form.getFieldValue('lastName')}
+              {passengers > 1 && <span style={{ fontSize: 12, opacity: 0.8, fontWeight: 500 }}> (+{passengers - 1} more)</span>}
             </div>
           </Col>
           <Col span={6}>
@@ -336,7 +342,7 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
           </Col>
           <Col span={6}>
             <div style={{ fontSize: 9, opacity: 0.6 }}>AMOUNT PAID</div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#4ade80' }}>{fmt(classData.total)}</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#4ade80' }}>{fmt(classData.total * passengers)}</div>
           </Col>
         </Row>
 
@@ -348,7 +354,7 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
             ))}
           </div>
         </div>
-        <div style={{ textAlign: 'center', fontSize: 9, opacity: 0.5, marginTop: 4 }}>APIX-{booking?.pnr || 'XXXXXXXX'}</div>
+        <div style={{ textAlign: 'center', fontSize: 9, opacity: 0.5, marginTop: 4 }}>AERONEXIS-{booking?.pnr || 'XXXXXXXX'}</div>
       </div>
 
       <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'center' }}>
@@ -384,18 +390,19 @@ const BookingModal = ({ visible, onClose, routeData, selectedAirline }) => {
       await new Promise(r => setTimeout(r, 2200));
       try {
         const vals = form.getFieldsValue();
+        const departure = travelDate ? dayjs(travelDate).format('YYYY-MM-DD') : dayjs().add(1, 'day').format('YYYY-MM-DD');
         const res = await API.post('/bookings', {
-          passenger_name: `${vals.firstName} ${vals.lastName}`,
+          passenger_name: `${vals.firstName} ${vals.lastName}` + (passengers > 1 ? ` (+${passengers - 1})` : ''),
           passenger_email: vals.email,
           passenger_phone: `+91${vals.phone}`,
           origin: routeData.origin,
           destination: routeData.destination,
           airline_code: selectedAirline.airline_code,
           fare_class: selectedClass,
-          fare_amount: classData.price,
-          taxes: classData.taxes,
-          total_amount: classData.total,
-          departure_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+          fare_amount: classData.price * passengers,
+          taxes: classData.taxes * passengers,
+          total_amount: classData.total * passengers,
+          departure_date: departure,
         });
         setBooking(res.data.data);
         setPaymentStep(2);

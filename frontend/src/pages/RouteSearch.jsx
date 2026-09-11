@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Select, Skeleton, Tag, Typography, Tabs, Tooltip, Slider, Checkbox, Row, Col, Badge } from 'antd';
+import { Select, Skeleton, Tag, Typography, Tabs, Tooltip, Slider, Checkbox, Row, Col, Badge, DatePicker } from 'antd';
 import {
   SearchOutlined, ThunderboltOutlined, ReloadOutlined,
   ExclamationCircleOutlined, HistoryOutlined, FilterOutlined
@@ -58,7 +58,7 @@ const fetchWithRetry = async (fn, n = 3) => {
 };
 
 // ─── FARE CARD ────────────────────────────────────────────────────────────────
-const FareCard = ({ airline, index, onBook, result, selectedClass, setSelectedClass }) => {
+const FareCard = ({ airline, index, onBook, result, selectedClass, setSelectedClass, passengers = 1, travelDate }) => {
   const [expanded, setExpanded] = useState(false);
   const isCheapest = index === 0;
   const cp = airline.class_prices?.[selectedClass] || { price: airline.avg_fare, taxes: Math.round(airline.avg_fare * 0.09), total: Math.round(airline.avg_fare * 1.09), seats_left: 6 };
@@ -138,8 +138,10 @@ const FareCard = ({ airline, index, onBook, result, selectedClass, setSelectedCl
 
           {/* Price + Book */}
           <Col xs={24} sm={5} style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 24, fontWeight: 900, color: COLOR, lineHeight: 1 }}>{fmt(cp.total)}</div>
-            <div style={{ fontSize: 10, color: C.muted, marginBottom: 8 }}>per adult</div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: COLOR, lineHeight: 1 }}>{fmt(cp.total * passengers)}</div>
+            <div style={{ fontSize: 10, color: C.muted, marginBottom: 8 }}>
+              {passengers > 1 ? `${fmt(cp.total)} × ${passengers} passengers` : 'per passenger'}
+            </div>
             {cp.seats_left <= 5 && (
               <div style={{ fontSize: 10, color: '#e53e3e', fontWeight: 700, marginBottom: 6 }}>🔥 {cp.seats_left} left</div>
             )}
@@ -161,10 +163,10 @@ const FareCard = ({ airline, index, onBook, result, selectedClass, setSelectedCl
           <div className="fare-expand-in" style={{ marginTop: 10, background: C.bg, borderRadius: 10, padding: '12px 16px' }}>
             <Row gutter={16}>
               {[
-                { l: 'Base Fare', v: cp.price },
-                { l: 'Taxes', v: cp.taxes },
-                { l: 'Conv. Fee', v: Math.round(cp.total * 0.02) },
-                { l: 'Total', v: cp.total, bold: true },
+                { l: 'Base Fare', v: cp.price * passengers },
+                { l: 'Taxes', v: cp.taxes * passengers },
+                { l: 'Conv. Fee', v: Math.round(cp.total * 0.02 * passengers) },
+                { l: `Total (${passengers} pax)`, v: (cp.total + Math.round(cp.total * 0.02)) * passengers, bold: true },
               ].map(r => (
                 <Col span={6} key={r.l}>
                   <div style={{ fontSize: 10, color: C.muted }}>{r.l}</div>
@@ -190,6 +192,8 @@ const RouteSearch = () => {
   const [selectedAirline, setSelectedAirline] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedClass, setSelectedClass] = useState('Economy');
+  const [travelDate, setTravelDate] = useState(dayjs().add(1, 'day'));
+  const [passengers, setPassengers] = useState(1);
   const [priceRange, setPriceRange] = useState([2000, 15000]);
   const [filterAirlines, setFilterAirlines] = useState([]);
   const [source, setSource] = useState('');
@@ -258,7 +262,7 @@ const RouteSearch = () => {
         </div>
 
         <Row gutter={[10, 10]} align="middle">
-          <Col xs={24} sm={7}>
+          <Col xs={24} sm={5}>
             <div style={{ fontSize: 9, color: 'rgba(255,153,51,0.85)', letterSpacing: 3, fontWeight: 700, marginBottom: 5 }}>FROM</div>
             <Select value={origin} onChange={setOrigin} size="large" style={{ width: '100%' }} showSearch
               optionLabelProp="label" filterOption={(i, o) => o.label?.toLowerCase().includes(i.toLowerCase())}
@@ -281,7 +285,7 @@ const RouteSearch = () => {
             <button className="swap-btn" onClick={swap} title="Swap">⇄</button>
           </Col>
 
-          <Col xs={24} sm={7}>
+          <Col xs={24} sm={5}>
             <div style={{ fontSize: 9, color: 'rgba(255,153,51,0.85)', letterSpacing: 3, fontWeight: 700, marginBottom: 5 }}>TO</div>
             <Select value={destination} onChange={setDestination} size="large" style={{ width: '100%' }} showSearch
               optionLabelProp="label" filterOption={(i, o) => o.label?.toLowerCase().includes(i.toLowerCase())}
@@ -301,19 +305,41 @@ const RouteSearch = () => {
           </Col>
 
           <Col xs={24} sm={4}>
+            <div style={{ fontSize: 9, color: 'rgba(255,153,51,0.85)', letterSpacing: 3, fontWeight: 700, marginBottom: 5 }}>DATE</div>
+            <DatePicker
+              value={travelDate}
+              onChange={d => setTravelDate(d || dayjs().add(1, 'day'))}
+              format="DD MMM YYYY"
+              disabledDate={c => c && c < dayjs().startOf('day')}
+              size="large"
+              style={{ width: '100%', borderRadius: 10 }}
+              allowClear={false}
+            />
+          </Col>
+
+          <Col xs={24} sm={3}>
+            <div style={{ fontSize: 9, color: 'rgba(255,153,51,0.85)', letterSpacing: 3, fontWeight: 700, marginBottom: 5 }}>PASSENGERS</div>
+            <Select value={passengers} onChange={setPassengers} size="large" style={{ width: '100%' }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                <Option key={n} value={n}>{n} {n === 1 ? 'Person' : 'Persons'}</Option>
+              ))}
+            </Select>
+          </Col>
+
+          <Col xs={24} sm={3}>
             <div style={{ fontSize: 9, color: 'rgba(255,153,51,0.85)', letterSpacing: 3, fontWeight: 700, marginBottom: 5 }}>CLASS</div>
             <Select value={selectedClass} onChange={setSelectedClass} size="large" style={{ width: '100%' }}>
               <Option value="Economy">Economy</Option>
-              <Option value="PremiumEconomy">Premium Economy</Option>
+              <Option value="PremiumEconomy">Prem Eco</Option>
               <Option value="Business">Business</Option>
             </Select>
           </Col>
 
-          <Col xs={24} sm={5} style={{ paddingTop: 18 }}>
+          <Col xs={24} sm={3} style={{ paddingTop: 18 }}>
             <button className={`search-btn${loading ? ' loading' : ''}`} onClick={() => doSearch(origin, destination)} disabled={loading} style={{ width: '100%', height: 40 }}>
               {loading
                 ? <span className="search-btn-inner"><span className="plane-fly">✈</span> Searching…</span>
-                : <span className="search-btn-inner"><SearchOutlined /> Search Flights</span>}
+                : <span className="search-btn-inner"><SearchOutlined /> Search</span>}
             </button>
           </Col>
         </Row>
@@ -452,7 +478,8 @@ const RouteSearch = () => {
               ) : display.map((a, i) => (
                 <FareCard key={a.airline_code} airline={a} index={i}
                   onBook={a => { setSelectedAirline(a); setBookingOpen(true); }}
-                  result={result} selectedClass={selectedClass} setSelectedClass={setSelectedClass} />
+                  result={result} selectedClass={selectedClass} setSelectedClass={setSelectedClass}
+                  passengers={passengers} travelDate={travelDate} />
               ))}
             </div>
 
@@ -473,7 +500,14 @@ const RouteSearch = () => {
       )}
 
       {/* Booking Modal */}
-      <BookingModal visible={bookingOpen} onClose={() => setBookingOpen(false)} routeData={result} selectedAirline={selectedAirline} />
+      <BookingModal
+        visible={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        routeData={result}
+        selectedAirline={selectedAirline}
+        travelDate={travelDate}
+        passengers={passengers}
+      />
 
       {/* ── Inline styles ── */}
       <style>{`
