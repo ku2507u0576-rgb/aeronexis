@@ -1,0 +1,171 @@
+/* Real India Route Map Component Styles */
+.real-india-map-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(24, 144, 255, 0.18);
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.real-india-map-card:hover {
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+}
+
+.real-india-map-header {
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.real-map-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+}
+
+.live-indicator {
+  font-size: 10px;
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.15);
+  border: 1px solid rgba(82, 196, 26, 0.3);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.real-map-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.real-map-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.leaflet-map-element {
+  background: #f8fafc;
+  z-index: 1;
+}
+
+/* Floating stats panel on the map */
+.real-route-floating-stats {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(24, 144, 255, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  pointer-events: none;
+  min-width: 170px;
+}
+
+/* Custom Marker Styling */
+.custom-airport-marker {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.marker-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease;
+}
+
+.custom-airport-marker:hover .marker-dot {
+  transform: scale(1.22);
+}
+
+/* Pulsing radar ring */
+@keyframes markerPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.marker-pulse-ring {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid;
+  animation: markerPulse 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  pointer-events: none;
+}
+
+/* Flight Path Line Dash Travel Animation */
+@keyframes flightDash {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.leaflet-active-flight-line {
+  animation: flightDash 1.2s linear infinite;
+}
+
+/* Footer Legend */
+.real-map-footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 11px;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.real-map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}

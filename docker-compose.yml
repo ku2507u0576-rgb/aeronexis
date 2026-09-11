@@ -1,0 +1,48 @@
+# Docker Compose for Real-Time Airfare Price Index (APIx)
+# Usage: docker-compose up --build
+
+version: '3.8'
+
+services:
+  # Backend API Server
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: apix-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./airfare_index.db
+      - API_KEY_SECRET=apix-demo-key-2026
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    volumes:
+      - ./backend:/app/backend
+      - db-data:/app/data
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: apix-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - api
+    command: npm start
+
+volumes:
+  db-data:
+    driver: local

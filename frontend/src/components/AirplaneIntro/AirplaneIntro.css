@@ -1,0 +1,273 @@
+/* ─── Intro Overlay ──────────────────────────────────────────────────────── */
+.airplane-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.9s ease;
+}
+
+.airplane-intro-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ─── Video ──────────────────────────────────────────────────────────────── */
+.intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.65) saturate(1.1);
+}
+
+/* ─── Overlays ───────────────────────────────────────────────────────────── */
+.intro-overlay-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(0,10,30,0.85), transparent);
+  pointer-events: none;
+}
+
+.intro-overlay-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0,10,30,0.92), transparent);
+  pointer-events: none;
+}
+
+.intro-overlay-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,20,0.6) 100%);
+  pointer-events: none;
+}
+
+/* ─── Tricolor ───────────────────────────────────────────────────────────── */
+.tricolor-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  display: flex;
+  z-index: 10;
+}
+.tricolor-saffron { flex: 1; background: #FF9933; }
+.tricolor-white   { flex: 1; background: #FFFFFF; }
+.tricolor-green   { flex: 1; background: #138808; }
+
+/* ─── Content ────────────────────────────────────────────────────────────── */
+.intro-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: white;
+  max-width: 700px;
+  padding: 0 24px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.intro-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Logo mark */
+.intro-logo-mark {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,153,51,0.6);
+  background: rgba(255,153,51,0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,153,51,0.3); }
+  50% { box-shadow: 0 0 0 16px rgba(255,153,51,0); }
+}
+
+.intro-plane-icon {
+  font-size: 32px;
+  animation: planeBob 3s ease-in-out infinite;
+}
+
+@keyframes planeBob {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50%       { transform: translateY(-6px) rotate(5deg); }
+}
+
+/* Eyebrow */
+.intro-eyebrow {
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: rgba(255,153,51,0.8);
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* Title */
+.intro-title {
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 900;
+  line-height: 1;
+  margin: 0 0 8px;
+  letter-spacing: -2px;
+  color: white;
+}
+
+.intro-title-accent {
+  color: #FF9933;
+  display: inline-block;
+  animation: shimmer 3s ease-in-out infinite;
+  background: linear-gradient(90deg, #FF9933, #FFD700, #FF9933);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Subtitle */
+.intro-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0 0 20px;
+  letter-spacing: 2px;
+  font-weight: 400;
+}
+
+/* Tagline */
+.intro-tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.7);
+  font-style: italic;
+  margin-bottom: 32px;
+}
+
+.intro-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  display: inline-block;
+}
+.intro-dot.saffron { background: #FF9933; }
+.intro-dot.green   { background: #138808; }
+
+/* Stats strip */
+.intro-stats-strip {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+}
+
+.intro-stat { text-align: center; }
+.intro-stat-val {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #FF9933;
+  line-height: 1;
+}
+.intro-stat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ─── Progress Bar ───────────────────────────────────────────────────────── */
+.intro-progress-bar {
+  position: absolute;
+  bottom: 60px; left: 50%;
+  transform: translateX(-50%);
+  width: min(400px, 80vw);
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.intro-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF9933, #FFD700);
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
+
+/* ─── Skip Button ────────────────────────────────────────────────────────── */
+.intro-skip-btn {
+  position: absolute;
+  bottom: 24px; right: 32px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.25s ease;
+}
+
+.intro-skip-btn:hover {
+  background: rgba(255,153,51,0.3);
+  border-color: rgba(255,153,51,0.6);
+  color: white;
+}
+
+/* ─── Loading ────────────────────────────────────────────────────────────── */
+.intro-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000a1e;
+  z-index: 5;
+}
+
+.intro-spinner {
+  width: 48px; height: 48px;
+  border: 3px solid rgba(255,153,51,0.2);
+  border-top-color: #FF9933;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Floating Bubbles animation (used in SearchCard) ────────────────────── */
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-20px) scale(1.05); }
+}
