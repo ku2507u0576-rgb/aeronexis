@@ -10,11 +10,8 @@ import dayjs from 'dayjs';
 
 const { Option } = Select;
 
-const API = axios.create({
-  baseURL: 'http://localhost:8000/v1',
-  headers: { 'X-API-Key': 'apix-demo-key-2026' },
-  timeout: 15000,
-});
+import { api as API } from '../services/api';
+
 
 // Indian name/phone validator
 const VALIDATORS = {

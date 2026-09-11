@@ -1,19 +1,16 @@
 import axios from 'axios';
 
-const getBaseURL = () => {
+export const getBaseURL = () => {
   if (typeof window !== 'undefined') {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:8000/v1';
     }
-    if (window.location.hostname.includes('onrender.com')) {
-      return 'https://aeronexis-api.onrender.com/v1';
-    }
-    return '/v1';
+    return 'https://aeronexis-api.onrender.com/v1';
   }
   return 'http://localhost:8000/v1';
 };
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: getBaseURL(),
   headers: {
     'X-API-Key': 'apix-demo-key-2026'

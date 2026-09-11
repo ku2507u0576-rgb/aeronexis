@@ -112,6 +112,7 @@ def read_root():
 
 
 @app.get("/health")
+@app.get("/v1/health")
 def health_check():
     """Enhanced health check — database, cache, and circuit breaker status."""
     from sqlalchemy import text

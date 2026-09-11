@@ -5,10 +5,8 @@ import axios from 'axios';
 
 const { Title, Text } = Typography;
 
-const API = axios.create({
-  baseURL: 'http://localhost:8000/v1',
-  headers: { 'X-API-Key': 'apix-demo-key-2026' },
-});
+import { api as API } from '../services/api';
+
 
 const fmt = (v) => `₹${Number(v).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 

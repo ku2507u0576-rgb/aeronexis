@@ -41,11 +41,8 @@ const AIRLINE_COLORS = { '6E': '#0A2472', 'AI': '#C0392B', 'IX': '#E67E22', 'SG'
 
 const fmt = (v) => `₹${Math.round(v || 0).toLocaleString('en-IN')}`;
 
-const API = axios.create({
-  baseURL: 'http://localhost:8000/v1',
-  headers: { 'X-API-Key': 'apix-demo-key-2026' },
-  timeout: 15000,
-});
+import { api as API } from '../services/api';
+
 
 const fetchWithRetry = async (fn, n = 3) => {
   for (let i = 0; i < n; i++) {

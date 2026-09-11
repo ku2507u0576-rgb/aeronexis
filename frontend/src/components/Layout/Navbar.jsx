@@ -13,10 +13,8 @@ dayjs.extend(relativeTime);
 const { Header } = Layout;
 const { Text } = Typography;
 
-const API = axios.create({
-  baseURL: 'http://localhost:8000/v1',
-  headers: { 'X-API-Key': 'apix-demo-key-2026' },
-});
+import { api as API } from '../../services/api';
+
 
 /* Build genuine real-time notifications from live API data */
 const buildNotifications = async () => {

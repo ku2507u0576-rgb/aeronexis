@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Typography, Collapse, Form, DatePicker, Select, Button, message, Divider } from 'antd';
 import { DownloadOutlined, ApiOutlined } from '@ant-design/icons';
-import { exportData } from '../services/api';
+import { exportData, getBaseURL } from '../services/api';
 import dayjs from 'dayjs';
 
 const { Title, Paragraph, Text } = Typography;
@@ -56,7 +56,7 @@ const APIExport = () => {
           The APIx platform provides programmatic access to airfare indices and raw quotes via a RESTful API.
         </Paragraph>
         <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 4, marginBottom: 16 }}>
-          <Text strong>Base URL: </Text> <Text code>http://localhost:8000/v1</Text><br />
+          <Text strong>Base URL: </Text> <Text code>{getBaseURL()}</Text><br />
           <Text strong>Authentication: </Text> Pass API key in the <Text code>X-API-Key</Text> header.
         </div>
 
